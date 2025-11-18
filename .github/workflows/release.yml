@@ -77,11 +77,13 @@ jobs:
       shell: pwsh
       run: |
         choco install nsis -y --no-progress
-        # Refresh environment variables added by Chocolatey so subsequent steps can find makensis
-        if (Test-Path "$env:ChocolateyInstall\helpers\refreshenv.ps1") {
-          & "$env:ChocolateyInstall\helpers\refreshenv.ps1"
-        }
-        Get-Command makensis -ErrorAction Stop
+
+    - name: Add NSIS to PATH
+      shell: pwsh
+      run: |
+        $nsisPath = "${env:ProgramFiles(x86)}\NSIS"
+        echo "$nsisPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        Write-Host "Added NSIS to PATH: $nsisPath"
 
     - name: Create installers
       shell: pwsh
