@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Squirrel;
 
-namespace Dayflow.System
+namespace Dayflow.Platform
 {
     /// <summary>
     /// Manages automatic updates using Squirrel.Windows

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Dayflow.System
+namespace Dayflow.Platform
 {
     /// <summary>
     /// Analytics service using PostHog (or similar)

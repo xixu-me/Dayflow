@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using Hardcodet.Wpf.TaskbarNotification;
 using Dayflow.Core.Recording;
 
-namespace Dayflow.System
+namespace Dayflow.Platform
 {
     /// <summary>
     /// Manages the system tray icon and menu

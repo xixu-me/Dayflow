@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dayflow.System
+namespace Dayflow.Platform
 {
     /// <summary>
     /// Monitors user inactivity to support idle reset feature

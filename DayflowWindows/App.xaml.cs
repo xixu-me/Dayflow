@@ -5,7 +5,7 @@ using Dayflow.Core.Recording;
 using Dayflow.Core.Storage;
 using Dayflow.Core.Security;
 using Dayflow.Core.AI;
-using Dayflow.System;
+using Dayflow.Platform;
 using Dayflow.ViewModels;
 
 namespace Dayflow
@@ -57,7 +57,7 @@ namespace Dayflow
             try
             {
                 // Initialize Sentry for error tracking
-                Sentry.SentrySdk.Init(options =>
+                SentrySdk.Init(options =>
                 {
                     options.Dsn = ""; // Configure in release
                     options.AutoSessionTracking = true;
@@ -93,7 +93,7 @@ namespace Dayflow
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 MessageBox.Show($"Failed to start Dayflow: {ex.Message}", "Startup Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(1);
@@ -103,7 +103,7 @@ namespace Dayflow
         protected override void OnExit(ExitEventArgs e)
         {
             _systemTray?.Dispose();
-            Sentry.SentrySdk.Close();
+            SentrySdk.Close();
             base.OnExit(e);
         }
 
