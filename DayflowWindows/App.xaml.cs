@@ -7,6 +7,7 @@ using Dayflow.Core.Security;
 using Dayflow.Core.AI;
 using Dayflow.Platform;
 using Dayflow.ViewModels;
+using Sentry;
 
 namespace Dayflow
 {

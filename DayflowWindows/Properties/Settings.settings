@@ -3,16 +3,16 @@
   <Profiles />
   <Settings>
     <Setting Name="WindowTop" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">-1</Value>
     </Setting>
     <Setting Name="WindowLeft" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">-1</Value>
     </Setting>
     <Setting Name="WindowHeight" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">800</Value>
+      <Value Profile="(Default)">600</Value>
     </Setting>
     <Setting Name="WindowWidth" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1200</Value>
+      <Value Profile="(Default)">800</Value>
     </Setting>
     <Setting Name="WindowState" Type="System.Windows.WindowState" Scope="User">
       <Value Profile="(Default)">Normal</Value>
@@ -22,12 +22,6 @@
     </Setting>
     <Setting Name="UserId" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="AIProvider" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Gemini</Value>
-    </Setting>
-    <Setting Name="LaunchAtStartup" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>
