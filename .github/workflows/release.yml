@@ -74,24 +74,36 @@ jobs:
           -o publish/win-arm64
 
     - name: Install NSIS
+      shell: pwsh
       run: |
-        choco install nsis -y
+        choco install nsis -y --no-progress
+        # Refresh environment variables added by Chocolatey so subsequent steps can find makensis
+        if (Test-Path "$env:ChocolateyInstall\helpers\refreshenv.ps1") {
+          & "$env:ChocolateyInstall\helpers\refreshenv.ps1"
+        }
+        Get-Command makensis -ErrorAction Stop
 
     - name: Create installers
       shell: pwsh
       run: |
-        # Add NSIS to PATH
-        $env:Path += ";C:\Program Files (x86)\NSIS"
+        # Resolve makensis (try PATH, then common installation locations)
+        $nsis = (Get-Command makensis -ErrorAction SilentlyContinue).Source
+        if (-not $nsis) {
+          if (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe') { $nsis = 'C:\Program Files (x86)\NSIS\makensis.exe' }
+          elseif (Test-Path 'C:\Program Files\NSIS\makensis.exe') { $nsis = 'C:\Program Files\NSIS\makensis.exe' }
+          else { Write-Error 'makensis not found. NSIS may not have been installed correctly.'; exit 1 }
+        }
+        Write-Host "Using makensis: $nsis"
 
         # Create x64 installer
         Copy-Item publish/win-x64 publish/current -Recurse
-        makensis /DVERSION="${{ steps.version.outputs.VERSION }}" installer.nsi
+        & $nsis /DVERSION="${{ steps.version.outputs.VERSION }}" installer.nsi
         Move-Item DayflowSetup.exe "DayflowSetup-${{ steps.version.outputs.VERSION }}-x64.exe"
 
         # Create ARM64 installer
         Remove-Item publish/current -Recurse
         Copy-Item publish/win-arm64 publish/current -Recurse
-        makensis /DVERSION="${{ steps.version.outputs.VERSION }}" /DARCH=ARM64 installer.nsi
+        & $nsis /DVERSION="${{ steps.version.outputs.VERSION }}" /DARCH=ARM64 installer.nsi
         Move-Item DayflowSetup.exe "DayflowSetup-${{ steps.version.outputs.VERSION }}-arm64.exe"
 
     - name: Create Squirrel releases
