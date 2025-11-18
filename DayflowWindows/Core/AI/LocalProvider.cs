@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Sentry;
 
 namespace Dayflow.Core.AI
 {
@@ -65,7 +66,7 @@ namespace Dayflow.Core.AI
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 throw;
             }
         }
