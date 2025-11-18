@@ -114,13 +114,15 @@ jobs:
       run: |
         dotnet list package --vulnerable --include-transitive
 
-    - name: SARIF output
+    - name: Save vulnerability report
       if: always()
       run: |
         dotnet list package --vulnerable --include-transitive --format json > security-scan.json
 
-    - name: Upload SARIF results
+    - name: Upload vulnerability report
       if: always()
-      uses: github/codeql-action/upload-sarif@v3
+      uses: actions/upload-artifact@v4
       with:
-        sarif_file: security-scan.json
+        name: vulnerability-report
+        path: security-scan.json
+        retention-days: 30
