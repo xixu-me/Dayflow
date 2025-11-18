@@ -4,6 +4,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Dayflow.Core.Security;
+using Sentry;
 
 namespace Dayflow.Core.AI
 {
