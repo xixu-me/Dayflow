@@ -109,18 +109,26 @@ jobs:
     - name: Create Squirrel releases
       shell: pwsh
       run: |
-        # Install Squirrel.Windows CLI with specific version
-        dotnet tool install -g Clowd.Squirrel --version 2.11.1
+        # Install Squirrel.Windows CLI with known working version
+        Write-Host "Installing Clowd.Squirrel..."
+        dotnet tool install --global Clowd.Squirrel --version 2.9.42
+
+        # Verify installation
+        $toolsDir = "$env:USERPROFILE\.dotnet\tools"
+        Write-Host "Tools directory: $toolsDir"
+
+        if (Test-Path $toolsDir) {
+          Write-Host "Contents of tools directory:"
+          Get-ChildItem $toolsDir
+        }
 
         # Use full path to squirrel executable
-        $squirrelExe = "$env:USERPROFILE\.dotnet\tools\squirrel.exe"
+        $squirrelExe = "$toolsDir\squirrel.exe"
 
         if (Test-Path $squirrelExe) {
           Write-Host "Squirrel found at: $squirrelExe"
         } else {
           Write-Error "Squirrel executable not found at: $squirrelExe"
-          Write-Host "Checking tools directory..."
-          Get-ChildItem "$env:USERPROFILE\.dotnet\tools" -ErrorAction SilentlyContinue
           exit 1
         }
 
