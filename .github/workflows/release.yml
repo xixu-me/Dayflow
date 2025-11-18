@@ -80,6 +80,9 @@ jobs:
     - name: Create installers
       shell: pwsh
       run: |
+        # Add NSIS to PATH
+        $env:Path += ";C:\Program Files (x86)\NSIS"
+
         # Create x64 installer
         Copy-Item publish/win-x64 publish/current -Recurse
         makensis /DVERSION="${{ steps.version.outputs.VERSION }}" installer.nsi
