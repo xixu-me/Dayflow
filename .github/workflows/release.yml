@@ -78,47 +78,20 @@ jobs:
       run: |
         choco install nsis -y --no-progress
 
-        # Debug: Find where makensis.exe actually is
-        Write-Host "Searching for makensis.exe..."
-        $found = Get-ChildItem -Path 'C:\' -Filter 'makensis.exe' -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($found) {
-          Write-Host "Found makensis.exe at: $($found.FullName)"
-        }
-
-        # Verify NSIS was installed in expected locations
-        if (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe') {
-          Write-Host "NSIS installed successfully at: C:\Program Files (x86)\NSIS\makensis.exe"
-        } elseif (Test-Path 'C:\Program Files\NSIS\makensis.exe') {
-          Write-Host "NSIS installed successfully at: C:\Program Files\NSIS\makensis.exe"
-        } else {
-          Write-Error "NSIS installation failed - makensis.exe not found in expected locations"
-          if ($found) {
-            Write-Host "But it was found at: $($found.FullName)"
-          }
-          exit 1
-        }
-
-    - name: Add NSIS to PATH
-      shell: pwsh
-      run: |
-        $nsisPath = "${env:ProgramFiles(x86)}\NSIS"
-        echo "$nsisPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        Write-Host "Added NSIS to PATH: $nsisPath"
-
     - name: Create installers
       shell: pwsh
       run: |
-        # Find makensis executable
-        $nsisExe = $null
-        if (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe') {
-          $nsisExe = 'C:\Program Files (x86)\NSIS\makensis.exe'
-        } elseif (Test-Path 'C:\Program Files\NSIS\makensis.exe') {
-          $nsisExe = 'C:\Program Files\NSIS\makensis.exe'
+        # Find makensis executable anywhere on the system
+        Write-Host "Searching for makensis.exe..."
+        $found = Get-ChildItem -Path 'C:\' -Filter 'makensis.exe' -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+
+        if ($found) {
+          $nsisExe = $found.FullName
+          Write-Host "Found makensis.exe at: $nsisExe"
         } else {
-          Write-Error 'makensis.exe not found in expected locations'
+          Write-Error "makensis.exe not found anywhere on the system"
           exit 1
         }
-        Write-Host "Using NSIS at: $nsisExe"
 
         # Create x64 installer
         Copy-Item publish/win-x64 publish/current -Recurse
@@ -139,30 +112,27 @@ jobs:
         # Install Squirrel.Windows CLI with specific version
         dotnet tool install -g Clowd.Squirrel --version 2.11.1
 
-        # Add dotnet tools to PATH
-        $toolsPath = "$env:USERPROFILE\.dotnet\tools"
-        $env:PATH += ";$toolsPath"
-        Write-Host "Added tools to PATH: $toolsPath"
-        Write-Host "Current PATH: $env:PATH"
+        # Use full path to squirrel executable
+        $squirrelExe = "$env:USERPROFILE\.dotnet\tools\squirrel.exe"
 
-        # Verify squirrel is available
-        $squirrelPath = Get-Command squirrel -ErrorAction SilentlyContinue
-        if ($squirrelPath) {
-          Write-Host "Squirrel found at: $($squirrelPath.Source)"
+        if (Test-Path $squirrelExe) {
+          Write-Host "Squirrel found at: $squirrelExe"
         } else {
-          Write-Error "Squirrel command not found in PATH"
+          Write-Error "Squirrel executable not found at: $squirrelExe"
+          Write-Host "Checking tools directory..."
+          Get-ChildItem "$env:USERPROFILE\.dotnet\tools" -ErrorAction SilentlyContinue
           exit 1
         }
 
         # Create x64 Squirrel release
-        squirrel pack `
+        & $squirrelExe pack `
           --packId Dayflow `
           --packVersion ${{ steps.version.outputs.VERSION }} `
           --packDirectory publish/win-x64 `
           --releaseDir releases/win-x64
 
         # Create ARM64 Squirrel release
-        squirrel pack `
+        & $squirrelExe pack `
           --packId Dayflow `
           --packVersion ${{ steps.version.outputs.VERSION }} `
           --packDirectory publish/win-arm64 `
