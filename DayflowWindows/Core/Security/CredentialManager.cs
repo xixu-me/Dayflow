@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using Sentry;
 
 namespace Dayflow.Core.Security
 {
@@ -41,7 +42,7 @@ namespace Dayflow.Core.Security
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 return false;
             }
         }
@@ -74,7 +75,7 @@ namespace Dayflow.Core.Security
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 return null;
             }
         }
@@ -91,7 +92,7 @@ namespace Dayflow.Core.Security
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 return false;
             }
         }
