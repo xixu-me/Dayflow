@@ -77,6 +77,15 @@ jobs:
       shell: pwsh
       run: |
         choco install nsis -y --no-progress
+        # Verify NSIS was installed
+        if (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe') {
+          Write-Host "NSIS installed successfully at: C:\Program Files (x86)\NSIS\makensis.exe"
+        } elseif (Test-Path 'C:\Program Files\NSIS\makensis.exe') {
+          Write-Host "NSIS installed successfully at: C:\Program Files\NSIS\makensis.exe"
+        } else {
+          Write-Error "NSIS installation failed - makensis.exe not found"
+          exit 1
+        }
 
     - name: Add NSIS to PATH
       shell: pwsh
@@ -88,24 +97,29 @@ jobs:
     - name: Create installers
       shell: pwsh
       run: |
-        # Resolve makensis (try PATH, then common installation locations)
-        $nsis = (Get-Command makensis -ErrorAction SilentlyContinue).Source
-        if (-not $nsis) {
-          if (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe') { $nsis = 'C:\Program Files (x86)\NSIS\makensis.exe' }
-          elseif (Test-Path 'C:\Program Files\NSIS\makensis.exe') { $nsis = 'C:\Program Files\NSIS\makensis.exe' }
-          else { Write-Error 'makensis not found. NSIS may not have been installed correctly.'; exit 1 }
+        # Find makensis executable
+        $nsisExe = $null
+        if (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe') {
+          $nsisExe = 'C:\Program Files (x86)\NSIS\makensis.exe'
+        } elseif (Test-Path 'C:\Program Files\NSIS\makensis.exe') {
+          $nsisExe = 'C:\Program Files\NSIS\makensis.exe'
+        } else {
+          Write-Error 'makensis.exe not found in expected locations'
+          exit 1
         }
-        Write-Host "Using makensis: $nsis"
+        Write-Host "Using NSIS at: $nsisExe"
 
         # Create x64 installer
         Copy-Item publish/win-x64 publish/current -Recurse
-        & $nsis /DVERSION="${{ steps.version.outputs.VERSION }}" installer.nsi
+        & $nsisExe /DVERSION="${{ steps.version.outputs.VERSION }}" installer.nsi
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         Move-Item DayflowSetup.exe "DayflowSetup-${{ steps.version.outputs.VERSION }}-x64.exe"
 
         # Create ARM64 installer
         Remove-Item publish/current -Recurse
         Copy-Item publish/win-arm64 publish/current -Recurse
-        & $nsis /DVERSION="${{ steps.version.outputs.VERSION }}" /DARCH=ARM64 installer.nsi
+        & $nsisExe /DVERSION="${{ steps.version.outputs.VERSION }}" /DARCH=ARM64 installer.nsi
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         Move-Item DayflowSetup.exe "DayflowSetup-${{ steps.version.outputs.VERSION }}-arm64.exe"
 
     - name: Create Squirrel releases
