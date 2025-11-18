@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Sentry;
 
 namespace Dayflow.Platform
 {
@@ -45,7 +46,7 @@ namespace Dayflow.Platform
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
             }
         }
 

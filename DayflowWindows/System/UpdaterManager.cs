@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows;
 using Squirrel;
+using Sentry;
 
 namespace Dayflow.Platform
 {
@@ -39,7 +40,7 @@ namespace Dayflow.Platform
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
             }
         }
 
@@ -99,7 +100,7 @@ namespace Dayflow.Platform
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 if (!silent)
                 {
                     MessageBox.Show(

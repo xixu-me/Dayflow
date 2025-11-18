@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Sentry;
 
 namespace Dayflow.Platform
 {
@@ -69,7 +70,7 @@ namespace Dayflow.Platform
                 }
                 catch (Exception ex)
                 {
-                    Sentry.SentrySdk.CaptureException(ex);
+                    SentrySdk.CaptureException(ex);
                 }
             }
         }
