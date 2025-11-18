@@ -77,13 +77,24 @@ jobs:
       shell: pwsh
       run: |
         choco install nsis -y --no-progress
-        # Verify NSIS was installed
+
+        # Debug: Find where makensis.exe actually is
+        Write-Host "Searching for makensis.exe..."
+        $found = Get-ChildItem -Path 'C:\' -Filter 'makensis.exe' -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($found) {
+          Write-Host "Found makensis.exe at: $($found.FullName)"
+        }
+
+        # Verify NSIS was installed in expected locations
         if (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe') {
           Write-Host "NSIS installed successfully at: C:\Program Files (x86)\NSIS\makensis.exe"
         } elseif (Test-Path 'C:\Program Files\NSIS\makensis.exe') {
           Write-Host "NSIS installed successfully at: C:\Program Files\NSIS\makensis.exe"
         } else {
-          Write-Error "NSIS installation failed - makensis.exe not found"
+          Write-Error "NSIS installation failed - makensis.exe not found in expected locations"
+          if ($found) {
+            Write-Host "But it was found at: $($found.FullName)"
+          }
           exit 1
         }
 
@@ -125,8 +136,23 @@ jobs:
     - name: Create Squirrel releases
       shell: pwsh
       run: |
-        # Install Squirrel.Windows CLI
-        dotnet tool install -g Clowd.Squirrel
+        # Install Squirrel.Windows CLI with specific version
+        dotnet tool install -g Clowd.Squirrel --version 2.11.1
+
+        # Add dotnet tools to PATH
+        $toolsPath = "$env:USERPROFILE\.dotnet\tools"
+        $env:PATH += ";$toolsPath"
+        Write-Host "Added tools to PATH: $toolsPath"
+        Write-Host "Current PATH: $env:PATH"
+
+        # Verify squirrel is available
+        $squirrelPath = Get-Command squirrel -ErrorAction SilentlyContinue
+        if ($squirrelPath) {
+          Write-Host "Squirrel found at: $($squirrelPath.Source)"
+        } else {
+          Write-Error "Squirrel command not found in PATH"
+          exit 1
+        }
 
         # Create x64 Squirrel release
         squirrel pack `
