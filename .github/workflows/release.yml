@@ -108,10 +108,16 @@ jobs:
 
     - name: Create Squirrel releases
       shell: pwsh
+      continue-on-error: true
       run: |
-        # Install Squirrel.Windows CLI with older stable version
-        Write-Host "Installing Clowd.Squirrel..."
-        dotnet tool install --global Clowd.Squirrel --version 2.6.0
+        # Try installing original Squirrel.Windows.Tools package
+        Write-Host "Installing Squirrel.Windows.Tools..."
+        try {
+          dotnet tool install --global Squirrel.Windows.Tools --version 1.9.1
+        } catch {
+          Write-Host "Failed to install Squirrel.Windows.Tools, trying Clowd.Squirrel..."
+          dotnet tool install --global Clowd.Squirrel --version 2.6.0
+        }
 
         # Verify installation
         $toolsDir = "$env:USERPROFILE\.dotnet\tools"
@@ -125,14 +131,13 @@ jobs:
         # Use full path to squirrel executable
         $squirrelExe = "$toolsDir\squirrel.exe"
 
-        if (Test-Path $squirrelExe) {
-          Write-Host "Squirrel found at: $squirrelExe"
-        } else {
-          Write-Error "Squirrel executable not found at: $squirrelExe"
-          Write-Host "Skipping Squirrel package creation due to installation failure"
-          Write-Host "NSIS installers were created successfully and can be used for distribution"
+        if (-not (Test-Path $squirrelExe)) {
+          Write-Warning "Squirrel executable not found at: $squirrelExe"
+          Write-Host "Skipping Squirrel package creation - NSIS installers are available for distribution"
           exit 0
         }
+
+        Write-Host "Squirrel found at: $squirrelExe"
 
         # Create x64 Squirrel release
         & $squirrelExe pack `
