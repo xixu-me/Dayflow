@@ -44,7 +44,7 @@ namespace Dayflow.Core.AI
             }
             catch (Exception ex)
             {
-                Sentry.SentrySdk.CaptureException(ex);
+                SentrySdk.CaptureException(ex);
                 throw;
             }
         }
