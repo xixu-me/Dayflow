@@ -80,9 +80,9 @@ Provide:
 
 Format your response as JSON:
 {
-  ""title"": ""...\",
-  ""summary"": ""...\",
-  ""category"": ""...\",
+  ""title"": ""..."",
+  ""summary"": ""..."",
+  ""category"": ""..."",
   ""isDistraction"": true/false
 }";
 
