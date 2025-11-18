@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Hardcodet.Wpf.TaskbarNotification;
 using Dayflow.Core.Recording;
+using Dayflow.Core.Storage;
 
 namespace Dayflow.Platform
 {
